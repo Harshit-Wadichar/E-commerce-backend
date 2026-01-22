@@ -8,21 +8,28 @@ export const newUser = async (
   next: NextFunction,
 ) => {
   try {
-    const { _id, name, email, photo, role, gender, dob } = req.body;
+    const { _id, name, email, photo, gender, dob } = req.body;
+    console.log(req.body);
+    console.log(_id, name, email, photo, gender, dob);
+    
 
     const user = await User.create({
       _id,
       name,
       email,
       photo,
-      role: role ?? "user",
       gender,
-      dob
+      dob: new Date(dob),
     });
     
     return res.status(201).json({
       success: true,
       message: `Welcome, ${user.name}`,
     });
-  } catch (err) {}
+  } catch (err) {
+    return res.status(201).json({
+      success: false,
+      message: `lol, error happened bro${err}`,
+    });
+  }
 };
