@@ -1,0 +1,1 @@
+{"version":3,"file":"utility-class.d.ts","sourceRoot":"","sources":["../../src/utils/utility-class.ts"],"names":[],"mappings":"AAAA,cAAM,YAAa,SAAQ,KAAK;IACT,OAAO,EAAE,MAAM;IAAS,UAAU,EAAE,MAAM;gBAA1C,OAAO,EAAE,MAAM,EAAS,UAAU,EAAE,MAAM;CAIhE;AAED,eAAe,YAAY,CAAC"}
