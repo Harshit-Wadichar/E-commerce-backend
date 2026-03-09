@@ -7,5 +7,11 @@ export interface NewRequestUserBody {
     gender: "male" | "female";
     dob: Date;
 }
+export interface NewProductRequestBody {
+    name: string;
+    price: number;
+    stock: number;
+    category: string;
+}
 export type ControllerType = (req: Request, res: Response, next: NextFunction) => Promise<void | Response<any, Record<string, any>>>;
 //# sourceMappingURL=types.d.ts.map
