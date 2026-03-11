@@ -27,7 +27,8 @@ app.get('/',(req,res)=>{
     res.send("ye route hai / yane ki home route")
 })
 
-app.use(errorMiddleware)
+app.use("/uploads", express.static("uploads"));
+app.use(errorMiddleware);
 
 app.listen(port, () => {
   console.log(`Server is running on port http://localhost:${port}`);

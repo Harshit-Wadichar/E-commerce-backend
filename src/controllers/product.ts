@@ -1,3 +1,4 @@
+import { rm } from "node:fs";
 import { TryCatch } from "../middlewares/error.js";
 import { Product } from "../models/product.js";
 import type { NewProductRequestBody } from "../types/types.js";
@@ -10,6 +11,14 @@ export const newProduct = TryCatch(
   ) => {
     const { name, price, stock, category } = req.body;
     const photo = req.file;
+
+    if (!photo) return next(new Error("Please upload a photo for the product", 400));
+    if (!price || !stock || !category || !name) {
+      rm(photo.path, ()=>{
+        console.log("File deleted")
+      })
+      return next(new Error("Please provide all fields", 400));
+    }
 
     await Product.create({
         name:name,
@@ -24,5 +33,21 @@ export const newProduct = TryCatch(
         message:"product created successfully"
     })
 
+  }
+);
+
+
+export const getlatestProducts = TryCatch(
+  async (
+    req: Request<{}, {}, NewProductRequestBody>,
+    res: ,
+    next: ,
+  ) => {
+    const products = await Product.find({}).sort({createdAt: -1}).limit(5);
+
+    res.status(201).json({
+        success:true,
+        products,
+    })
   }
 );

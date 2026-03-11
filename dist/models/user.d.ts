@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 interface IUser extends Document {
-    id: string;
+    _id: string;
     name: string;
     email: string;
     photo: string;
@@ -11,10 +11,12 @@ interface IUser extends Document {
     updatedAt: Date;
     age: number;
 }
-export declare const User: mongoose.Model<IUser, {}, {}, {}, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & {
-    _id: mongoose.Types.ObjectId;
-} & {
+export declare const User: mongoose.Model<IUser, {}, {}, {}, mongoose.Document<unknown, {}, IUser, {}, mongoose.DefaultSchemaOptions> & IUser & Required<{
+    _id: string;
+}> & {
     __v: number;
+} & {
+    id: string;
 }, any, IUser>;
 export {};
 //# sourceMappingURL=user.d.ts.map

@@ -1,23 +1,23 @@
 import mongoose from "mongoose";
 import validator from "validator";
 const schema = new mongoose.Schema({
-    id: {
+    _id: {
         type: String,
-        requried: [true, "Please enter ID"],
+        required: [true, "Please enter ID"],
     },
     name: {
         type: String,
-        requried: [true, "Please enter name"],
+        required: [true, "Please enter name"],
     },
     email: {
         type: String,
         unique: [true, "Email already exists"],
-        requried: [true, "Please enter name"],
+        required: [true, "Please enter email"],
         validate: validator.default.isEmail,
     },
     photo: {
         type: String,
-        requried: [true, "Please add photo"],
+        required: [true, "Please add photo"],
     },
     role: {
         type: String,
