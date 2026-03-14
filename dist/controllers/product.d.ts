@@ -1,3 +1,9 @@
 export declare const newProduct: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<any>;
 export declare const getlatestProducts: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<any>;
+export declare const getAllCategories: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<any>;
+export declare const getAdminProducts: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<any>;
+export declare const getSingleProduct: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<any>;
+export declare const updateProduct: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<any>;
+export declare const deleteProduct: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<any>;
+export declare const getAllProducts: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<any>;
 //# sourceMappingURL=product.d.ts.map
