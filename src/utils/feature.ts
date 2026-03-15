@@ -1,4 +1,7 @@
 import mongoose from "mongoose"
+import { myCache } from "../app.js"
+import type { invalidateCacheProps } from "../types/types.js"
+import { Product } from "../models/product.js"
 
 export const connectDb = async () =>{
     try {
@@ -9,4 +12,24 @@ export const connectDb = async () =>{
         console.log("Database connection failed")
         console.log(error)
     }
+}
+
+export const invalidateCache = async ({product, order, admin}: invalidateCacheProps) =>{
+   if(product){
+    const productKeys: string[] = ["latest-product", "categories", "all-products"];
+
+    const product = await Product.find({}).select("_id");
+
+    product.forEach((i)=>{
+        productKeys.push(`product-${i._id}`);
+    });
+
+    myCache.del(productKeys);
+   }
+   if(order){
+
+   }
+   if(admin){
+
+   }
 }
