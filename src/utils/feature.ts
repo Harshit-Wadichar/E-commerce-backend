@@ -1,11 +1,11 @@
 import mongoose from "mongoose"
 import { myCache } from "../app.js"
-import type { invalidateCacheProps } from "../types/types.js"
+import type { invalidateCacheProps, OrderItemType } from "../types/types.js"
 import { Product } from "../models/product.js"
 
-export const connectDb = async () =>{
+export const connectDb = async (uri:string) =>{
     try {
-        await mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/ecommerce26").then((c)=>{
+        await mongoose.connect(uri).then((c)=>{
             console.log(`DB connected to ${c.connection.host}`)
         })
     } catch (error) {
@@ -32,4 +32,17 @@ export const invalidateCache = async ({product, order, admin}: invalidateCachePr
    if(admin){
 
    }
+}
+
+export const reduceStock = async (orderItems: OrderItemType[]) =>{
+    for(let i=0; i<orderItems.length; i++){
+        const order = orderItems[i];
+        const product = await Product.findById(order?.productId);
+        if(product!){
+            throw new Error("Product not found bro");
+        }
+        product.stock -= order?.quantity;
+        await product.save();
+    }
+
 }
