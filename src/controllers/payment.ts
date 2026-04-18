@@ -50,7 +50,7 @@ export const applyDiscount = TryCatch(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    message: `discount: $${discount.amount}`,
+    discount: discount.amount,
   });
 });
 

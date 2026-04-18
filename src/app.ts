@@ -4,10 +4,12 @@ import { connect } from 'node:http2';
 import { connectDb } from './utils/feature.js';
 import { errorMiddleware } from './middlewares/error.js';
 import Stripe from 'stripe';
+import cors from "cors";
 
 import {config} from "dotenv";
 import NodeCache  from 'node-cache';
 import morgan from "morgan";
+
 
 //importing user routes
 import userRoutes from './routes/user.js';
@@ -32,6 +34,7 @@ export const myCache = new NodeCache()
 const app = express();
 app.use(express.json());
 app.use(morgan("dev"))
+app.use(cors());
 
 //routes
 app.use("/api/v1/user", userRoutes);

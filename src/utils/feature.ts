@@ -28,6 +28,7 @@ export const invalidateCache = ({
       "latest-product",
       "categories",
       "all-products",
+      "admin-products",
       `product-${productId}`,
     ];
 
@@ -50,7 +51,7 @@ export const invalidateCache = ({
   }
   if (admin) {
     myCache.del([
-      "admin-stats",
+      "dashboard-stats",
       "admin-pie-charts",
       "admin-bar-charts",
       "admin-line-charts",

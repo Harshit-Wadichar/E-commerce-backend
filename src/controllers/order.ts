@@ -161,6 +161,6 @@ export const deleteOrder = TryCatch(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    message: "Order placed successfully",
+    message: "Order deleted successfully",
   });
 });
