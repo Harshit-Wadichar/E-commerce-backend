@@ -273,7 +273,7 @@ export const getPieCharts = TryCatch(async (_req, res, _next) => {
       0,
     );
 
-    const marketingCost = Math.round(grossIncome * (30 / 100)); \
+    const marketingCost = Math.round(grossIncome * (30 / 100)); 
 
     const netMargin = grossIncome - productionCost - discount - burnt - marketingCost;
 
