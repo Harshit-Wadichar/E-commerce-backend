@@ -42,7 +42,7 @@ export const newCoupon = TryCatch(async (req, res, next) => {
 export const applyDiscount = TryCatch(async (req, res, next) => {
   const { coupon } = req.query || {};
 
-  const discount = await Coupon.findOne({ code: coupon });
+  const discount = await Coupon.findOne({ code: String(coupon) });
 
   if (!discount) {
     return next(new ErrorHandler("discount not found", 400));

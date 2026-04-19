@@ -1,4 +1,4 @@
-import type { NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 
 export interface NewRequestUserBody {
   _id: string;

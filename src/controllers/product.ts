@@ -1,4 +1,5 @@
 import { rm } from "node:fs";
+import type { Request } from "express";
 import { TryCatch } from "../middlewares/error.js";
 import { Product } from "../models/product.js";
 import type {
@@ -8,7 +9,7 @@ import type {
 } from "../types/types.js";
 import { myCache } from "../app.js";
 import { invalidateCache } from "../utils/feature.js";
-import { error } from "node:console";
+import ErrorHandler from "../utils/utility-class.js";
 //import {faker} from "@faker-js/faker";
 
 
@@ -75,7 +76,7 @@ export const getSingleProduct = TryCatch(async (req, res, next) => {
   else{
     product = await Product.findById(id);
 
-    if (!product) return next(new Error("product not found for this id", 404));
+    if (!product) return next(new ErrorHandler("product not found for this id", 404));
     myCache.set(`product-${id}`, JSON.stringify(product));
   }
   
@@ -91,12 +92,12 @@ export const newProduct = TryCatch(
     const photo = req.file;
 
     if (!photo)
-      return next(new Error("Please upload a photo for the product", 400));
+      return next(new ErrorHandler("Please upload a photo for the product", 400));
     if (!price || !stock || !category || !name) {
       rm(photo.path, () => {
         console.log("File deleted");
       });
-      return next(new Error("Please provide all fields", 400));
+      return next(new ErrorHandler("Please provide all fields", 400));
     }
 
     await Product.create({
@@ -123,7 +124,7 @@ export const updateProduct = TryCatch(async (req, res, next) => {
 
   const product = await Product.findById(id);
 
-  if (!product) return next(new Error("invalid id", 404));
+  if (!product) return next(new ErrorHandler("invalid id", 404));
 
   if (photo) {
     rm(product.photo!, () => {
@@ -150,7 +151,7 @@ export const deleteProduct = TryCatch(async (req, res, next) => {
   const id = req.params.id;
   const product = await Product.findById(id);
 
-  if (!product) return next(new Error("poduct not found for this id", 404));
+  if (!product) return next(new ErrorHandler("poduct not found for this id", 404));
 
   rm(product.photo!, () => {
     console.log("Photo deleted for the product");

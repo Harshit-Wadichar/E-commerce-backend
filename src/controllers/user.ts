@@ -14,7 +14,7 @@ export const newUser = TryCatch(
     console.log(req.body);
     console.log(_id, name, email, photo, gender, dob);
 
-    const user = await User.findById(_id);
+    let user = await User.findById(_id);
 
     if (user)
       return res.status(200).json({

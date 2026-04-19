@@ -29,12 +29,11 @@ export const invalidateCache = ({
       "categories",
       "all-products",
       "admin-products",
-      `product-${productId}`,
     ];
 
     if (typeof productId === "string") productKeys.push(`product-${productId}`);
 
-    if (typeof productId === "object") {
+    if (typeof productId === "object" && productId !== null) {
       productId.forEach((id) => productKeys.push(`product-${id}`));
     }
 
@@ -62,11 +61,12 @@ export const invalidateCache = ({
 export const reduceStock = async (orderItems: OrderItemType[]) => {
   for (let i = 0; i < orderItems.length; i++) {
     const order = orderItems[i];
-    const product = await Product.findById(order?.productId);
-    if (product!) {
+    if (!order) continue;
+    const product = await Product.findById(order.productId);
+    if (!product) {
       throw new Error("Product not found bro");
     }
-    product.stock -= order?.quantity;
+    product.stock -= order.quantity;
     await product.save();
   }
 };
@@ -97,14 +97,14 @@ export const getInventories = async ({
       [category]:
         productCount === 0
           ? 0
-          : Math.round((categoriesCount[i] / productCount) * 100),
+          : Math.round((categoriesCount[i]! / productCount) * 100),
     });
   });
 
   return categoryCount;
 };
 
-interface MyDocument extends Document {
+interface MyDocument {
   createdAt: Date;
   discount?: number;
   total?: number;
@@ -130,9 +130,9 @@ export const getChartData = ({
     const monthDiff = (today.getMonth() - creationDate.getMonth() + 12) % 12;
 
     if (property) {
-      data[length - monthDiff - 1] += i[property]!;
+      data[length - monthDiff - 1]! += i[property]!;
     } else {
-      data[length - monthDiff - 1] += 1;
+      data[length - monthDiff - 1]! += 1;
     }
   });
 
