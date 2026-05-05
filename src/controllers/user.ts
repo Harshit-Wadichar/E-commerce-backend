@@ -82,7 +82,7 @@ export const deleteUser = TryCatch(async (req, res, next) => {
       ),
     );
 
-    await user.deleteOne();
+  await user.deleteOne();
 
   return res.status(200).json({
     success: true,

@@ -2,16 +2,16 @@ import mongoose from "mongoose";
 import validator from "validator";
 
 export interface IUser {
-  _id: string;
-  name: string;
-  email: string;
-  photo: string;
-  role: "admin" | "user";
-  gender: "male" | "female";
-  dob: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  age: number;
+    _id: string;
+    name: string;
+    email: string;
+    photo: string;
+    role: "admin" | "user";
+    gender: "male" | "female";
+    dob: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    age: number;
 }
 
 const schema = new mongoose.Schema({
@@ -20,50 +20,50 @@ const schema = new mongoose.Schema({
         type: String,
         required: [true, "Please enter ID"],
     },
-     name: {
+    name: {
         type: String,
-         required: [true, "Please enter name"],
+        required: [true, "Please enter name"],
     },
-     email: {
+    email: {
         type: String,
         unique: [true, "Email already exists"],
         required: [true, "Please enter email"],
-        validate: validator.default.isEmail,
+        validate: validator.isEmail,
     },
     photo: {
         type: String,
         required: [true, "Please add photo"],
     },
-    role:{
+    role: {
         type: String,
         enum: ["user", "admin"],
         default: "user",
     },
-    gender:{
+    gender: {
         type: String,
         enum: ["male", "female"],
         required: [true, "please enter your gender"],
     },
-    dob:{
+    dob: {
         type: Date,
         required: [true, "please enter your date of birth"],
-       
+
     },
 
-},{
+}, {
     timestamps: true,
 })
 
 schema.virtual("age").get(function () {
     const today = new Date();
     const dob = this.dob;
+    if(!dob) return null;
     let age = today.getFullYear() - dob.getFullYear();
 
-    if(
+    if (
         today.getMonth() < dob.getMonth() ||
-        (today.getMonth()=== dob.getMonth() && today.getDate() < dob.getDate())
-    )
-    {age--;}
+        (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())
+    ) { age--; }
 
     return age;
 })

@@ -22,20 +22,20 @@ export const createPaymentIntent = TryCatch(async (req, res, next) => {
 });
 
 export const newCoupon = TryCatch(async (req, res, next) => {
-  const { coupon, amount } = req.body || {};
+  const { code, amount } = req.body || {};
 
-  if (!coupon || !amount) {
+  if (!code || !amount) {
     return next(
       new ErrorHandler("coupon code and amount both are required bro", 400),
     );
   }
   await Coupon.create({
-    code: coupon,
+    code,
     amount,
   });
   res.status(201).json({
     success: true,
-    message: `coupon ${coupon} created successfully`,
+    message: `coupon ${code} created successfully`,
   });
 });
 
@@ -60,6 +60,44 @@ export const allCoupons = TryCatch(async (req, res, next) => {
   res.status(201).json({
     success: true,
     coupons,
+  });
+});
+
+export const updateCoupon = TryCatch(async (req, res, next) => {
+  const { id } = req.params || {};
+
+  const {code, amount} = req.body || {};
+
+  const coupon = await Coupon.findById(id);
+
+  if (!coupon) {
+    return next(new ErrorHandler("coupon with this ID not found", 400));
+  }
+
+  if(code) coupon.code = code;
+
+  if(amount) coupon.amount = amount;
+
+  await coupon.save();
+
+  res.status(201).json({
+    success: true,
+    message: `Coupon ${coupon.code} updated successfully`,
+  });
+});
+
+export const getCoupon = TryCatch(async (req, res, next) => {
+  const { id } = req.params || {};
+
+  const coupon = await Coupon.findById(id);
+
+  if (!coupon) {
+    return next(new ErrorHandler("coupon with this ID not found", 400));
+  }
+
+  res.status(201).json({
+    success: true,
+    coupon,
   });
 });
 

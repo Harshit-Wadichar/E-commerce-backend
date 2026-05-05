@@ -1,8 +1,72 @@
+import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
+import { Redis } from "ioredis";
 import mongoose from "mongoose";
-import { myCache } from "../app.js";
-import type { invalidateCacheProps, OrderItemType } from "../types/types.js";
+import { redis } from "../app.js";
 import { Product } from "../models/product.js";
-import { Order } from "../models/order.js";
+import { Review } from "../models/review.js";
+import type { invalidateCacheProps, OrderItemType } from "../types/types.js";
+
+export const findAverageRatings = async (
+  productId: mongoose.Types.ObjectId,
+) => {
+  let totalRating = 0;
+
+  const reviews = await Review.find({ product: productId });
+  reviews.forEach((review) => {
+    totalRating += review.rating;
+  });
+
+  const averageRating = Math.floor(totalRating / reviews.length) || 0;
+
+  return {
+    ratings: averageRating,
+    numOfReviews: reviews.length,
+  };
+};
+
+const getBase64 = (file: Express.Multer.File) =>
+  `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+
+export const uploadToCloudinary = async (files: Express.Multer.File[]) => {
+  const promises = files.map(async (file) => {
+    return new Promise<UploadApiResponse>((resolve, reject) => {
+      cloudinary.uploader.upload(getBase64(file), (error, result) => {
+        if (error) return reject(error);
+        resolve(result!);
+      });
+    });
+  });
+  const result = await Promise.all(promises);
+
+  return result.map((i) => ({
+    public_id: i.public_id,
+    url: i.secure_url,
+  }));
+};
+
+export const deleteFromCloudinary = async (publicId: string[]) => {
+  const promises = publicId.map((id) => {
+    return new Promise<void>((resolve, reject) => {
+      cloudinary.uploader.destroy(id, (error, result) => {
+        if (error) return console.log(error);
+        resolve();
+      });
+    });
+  });
+
+  await Promise.all(promises);
+};
+
+export const connectRedis = (redisURI: string) => {
+  const redis = new Redis(redisURI);
+  redis.on("connect", () => {
+    console.log("Redis connected");
+  });
+  redis.on("error", (err) => {
+    console.log(err);
+  });
+  return redis;
+};
 
 export const connectDb = async (uri: string) => {
   try {
@@ -15,14 +79,18 @@ export const connectDb = async (uri: string) => {
   }
 };
 
-export const invalidateCache = ({
+export const invalidateCache = async ({
   product,
   order,
   admin,
+  review,
   userId,
   orderId,
   productId,
 }: invalidateCacheProps) => {
+  if(review){
+    await redis.del([`reviews-${productId}`])
+  }
   if (product) {
     const productKeys: string[] = [
       "latest-product",
@@ -37,7 +105,7 @@ export const invalidateCache = ({
       productId.forEach((id) => productKeys.push(`product-${id}`));
     }
 
-    myCache.del(productKeys);
+    await redis.del(productKeys);
   }
   if (order) {
     const ordersKeys: string[] = [
@@ -46,10 +114,10 @@ export const invalidateCache = ({
       `order-${orderId}`,
     ];
 
-    myCache.del(ordersKeys);
+     await redis.del(ordersKeys);
   }
   if (admin) {
-    myCache.del([
+    await redis.del([
       "dashboard-stats",
       "admin-pie-charts",
       "admin-bar-charts",
