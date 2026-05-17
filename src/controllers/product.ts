@@ -1,4 +1,5 @@
 import type { Request } from "express";
+import { isValidObjectId, Types } from "mongoose";
 import { redis, redisTTL } from "../app.js";
 import { TryCatch } from "../middlewares/error.js";
 import { Product } from "../models/product.js";
@@ -16,7 +17,6 @@ import {
   uploadToCloudinary,
 } from "../utils/feature.js";
 import ErrorHandler from "../utils/utility-class.js";
-import { request } from "node:http";
 //import {faker} from "@faker-js/faker";
 
 //revalidate on New product creation, update and delete, and also on new order
@@ -268,17 +268,23 @@ export const getAllProducts = TryCatch(
 
 export const getReview = TryCatch(async (req, res, next) => {
   let reviews;
-  const key = `reviews-${req.params.id}`
+  const { id } = req.params;
+
+  if (typeof id !== "string" || !isValidObjectId(id))
+    return next(new ErrorHandler("Invalid product id", 400));
+
+  const productId = new Types.ObjectId(id);
+  const key = `reviews-${id}`;
 
   reviews = await redis.get(key);
 
   if (reviews) reviews = JSON.parse(reviews);
   else {
-    reviews = await Review.find({ product:  req.params.id })
+    reviews = await Review.find({ product: productId })
       .populate("user", "name photo")
       .sort({ updatedAt: -1 });
 
-    await redis.setex(key,redisTTL, JSON.stringify(reviews));
+    await redis.setex(key, redisTTL, JSON.stringify(reviews));
   }
 
   res.status(200).json({
