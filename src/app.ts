@@ -5,6 +5,7 @@ import { connectDb, connectRedis } from "./utils/feature.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import Stripe from "stripe";
 import cors from "cors";
+import type { CorsOptions } from "cors";
 
 import { config } from "dotenv";
 import morgan from "morgan";
@@ -26,6 +27,31 @@ const mongoUri = process.env.MONGO_URI || "";
 const stripeKey = process.env.STRIPE_KEY || "";
 const redisURI = process.env.REDIS_URI || "";
 export const redisTTL = process.env.REDIS_TTL || 60 * 60 * 4; 
+
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "https://e-commerce-frontend-tan-kappa.vercel.app",
+]
+  .flatMap((url) => url?.split(",") ?? [])
+  .map((url) => url.trim())
+  .filter(Boolean);
+
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
 
 const { CLOUD_NAME, CLOUD_API_KEY, CLOUD_API_SECRET } = process.env;
@@ -49,11 +75,7 @@ export const stripe = new Stripe(stripeKey);
 const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
-app.use(cors({
-  origin: [process.env.CLIENT_URL!],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}));
+app.use(cors(corsOptions));
 
 //routes
 app.use("/api/v1/user", userRoutes);
