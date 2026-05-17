@@ -39,14 +39,25 @@ const allowedOrigins = [
   .map((url) => url.trim())
   .filter(Boolean);
 
+const isAllowedOrigin = (origin: string) => {
+  if (allowedOrigins.includes(origin)) return true;
+
+  try {
+    const { hostname } = new URL(origin);
+    return hostname.endsWith(".vercel.app");
+  } catch {
+    return false;
+  }
+};
+
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || isAllowedOrigin(origin)) {
       callback(null, true);
       return;
     }
 
-    callback(new Error(`Not allowed by CORS: ${origin}`));
+    callback(null, false);
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -76,6 +87,7 @@ const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 //routes
 app.use("/api/v1/user", userRoutes);
